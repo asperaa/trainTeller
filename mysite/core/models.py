@@ -15,7 +15,7 @@ class Profile(models.Model):
     first_name=models.TextField(max_length=100,blank=True)
     second_name=models.TextField(max_length=100,blank=True)
     email=models.EmailField(max_length=60,blank=True)
-    uid = models.UUIDField(default=uuid.uuid4)
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4,)
 
 
 @receiver(post_save, sender=User)
@@ -23,3 +23,11 @@ def update_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
     instance.profile.save()
+
+
+class Chat(models.Model):
+    message = models.TextField()
+    user_uuid=models.ForeignKey()
+
+    def __str__(self):
+        return self.message
