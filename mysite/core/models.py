@@ -27,6 +27,7 @@ def update_user_profile(sender, instance, created, **kwargs):
 
 class Chat(models.Model):
     message = models.TextField()
+    response = models.TextField()
     user_uuid = models.ForeignKey('Profile', on_delete=models.CASCADE,)
 
     def __str__(self):

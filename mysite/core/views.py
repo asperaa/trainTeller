@@ -2,6 +2,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.conf import settings
+from dialogflow_lite.dialogflow import Dialogflow
+
+import json
+
 from mysite.core.forms import SignUpForm
 from mysite.core.forms import ChatForm
 from .models import Profile
@@ -37,6 +44,10 @@ def chat(request):
             mess = form.save(commit=False)
             user_uid = Profile.objects.get(user=request.user)
             mess.user_uuid = user_uid
+            dialogflow = Dialogflow(**settings.DIALOGFLOW)
+            responses = dialogflow.text_request(str(mess.message))
+            mess.response = responses[0]
+
             mess.save()
 
             return render(request, 'chat.html', {'mess': mess})
