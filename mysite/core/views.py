@@ -66,7 +66,7 @@ def chat(request):
 
                 source_code = source_code_json["stations"][0]["code"]
                 dest_code = dest_code_json["stations"][0]["code"]
-                #print(source_code, dest_code)
+
 
                 final_response = requests.get('https://api.railwayapi.com/v2/between/source/'+source_code+'/dest/'+dest_code+'/date/<15-09-2018>/apikey/rfgbncxndq/')
                 final_response_json = final_response.json()
