@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Welcome, {{ user.get_full_name }} (<small>{{ user.email }}</small>)</h2>
+  <form action="/chat/" method="POST">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Send">
+</form>
+  <p>Your UUID: {{ user.profile.uid }}</p>
+{% endblock %}

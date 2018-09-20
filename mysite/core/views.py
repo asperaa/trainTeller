@@ -3,6 +3,8 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 
 from mysite.core.forms import SignUpForm
+from mysite.core.forms import ChatForm
+from .models import Profile
 
 
 @login_required
@@ -25,3 +27,22 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
+
+
+def chat(request):
+
+    if request.method == 'POST':
+        form = ChatForm(request.POST)
+        if form.is_valid():
+            mess = form.save(commit=False)
+            user_uid = Profile.objects.get(user=request.user)
+            mess.user_uuid = user_uid
+            mess.save()
+
+            return render(request, 'chat.html', {'mess': mess})
+    else:
+        form = ChatForm()
+
+    return render(request, 'sendMessage.html', {'form': form})
+
+
