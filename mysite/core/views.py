@@ -8,11 +8,13 @@ from django.conf import settings
 from dialogflow_lite.dialogflow import Dialogflow
 
 import json
+import requests
 
 from mysite.core.forms import SignUpForm
 from mysite.core.forms import ChatForm
 from .models import Profile
 
+myapikey='rfgbncxndq'
 
 @login_required
 def home(request):
@@ -48,9 +50,32 @@ def chat(request):
             responses = dialogflow.text_request(str(mess.message))
             mess.response = responses[0]
 
-            mess.save()
+            if(len(mess.response.split())!=2):
+                mess.save()
 
-            return render(request, 'chat.html', {'mess': mess})
+                return render(request, 'chat.html', {'mess': mess})
+
+            else:
+                source, destination = mess.response.split()
+                source_code_response = requests.get('https://api.railwayapi.com/v2/name-to-code/station/'+source+'/apikey/rfgbncxndq/')
+                dest_code_response = requests.get('https://api.railwayapi.com/v2/name-to-code/station/'+destination+'/apikey/rfgbncxndq/')
+
+                source_code_json = source_code_response.json()
+                dest_code_json = dest_code_response.json()
+
+
+                source_code = source_code_json["stations"][0]["code"]
+                dest_code = dest_code_json["stations"][0]["code"]
+                #print(source_code, dest_code)
+
+                final_response = requests.get('https://api.railwayapi.com/v2/between/source/'+source_code+'/dest/'+dest_code+'/date/<15-09-2018>/apikey/rfgbncxndq/')
+                final_response_json = final_response.json()
+                final_response_string = json.dumps(final_response_json)
+                mess.response = final_response_string
+                mess.save()
+
+                return render(request, 'chat.html', {'mess': mess})
+
     else:
         form = ChatForm()
 
